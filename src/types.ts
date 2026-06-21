@@ -312,6 +312,7 @@ export const sortByJabatan = <T extends { jabatanPosisi?: string; jabatan?: stri
   return nameA.localeCompare(nameB, 'id');
 };
 
+<<<<<<< HEAD
 /**
  * Types & Interfaces for KESALAHAN LC
  */
@@ -324,4 +325,6 @@ export interface KesalahanLcRecord {
 }
 
 
+=======
+>>>>>>> dd1fdeb9e7a80a95922018967ec719063483a626
 

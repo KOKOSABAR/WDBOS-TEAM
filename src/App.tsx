@@ -20,7 +20,11 @@ import {
   Database
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+<<<<<<< HEAD
 import { Staff, calculateAge, getBirthdayInfo, calculateTenure, MistakeRecord, OvertimeRecord, LeaveSubmission, KesalahanLcRecord } from './types';
+=======
+import { Staff, calculateAge, getBirthdayInfo, calculateTenure, MistakeRecord, OvertimeRecord, LeaveSubmission } from './types';
+>>>>>>> dd1fdeb9e7a80a95922018967ec719063483a626
 import { SAMPLE_STAFF, SAMPLE_MISTAKES, SAMPLE_OVERTIMES } from './sampleData';
 
 // Modular Components
@@ -29,7 +33,10 @@ import CutiSubmissionView from './components/CutiSubmissionView';
 import VisaExpiryView from './components/VisaExpiryView';
 import StaffMistakesView from './components/StaffMistakesView';
 import StaffOvertimeView from './components/StaffOvertimeView';
+<<<<<<< HEAD
 import KesalahanLcView from './components/KesalahanLcView';
+=======
+>>>>>>> dd1fdeb9e7a80a95922018967ec719063483a626
 import SheetsSyncModal from './components/SheetsSyncModal';
 
 const getStatusFormBgClass = (status: string) => {
@@ -669,7 +676,18 @@ export default function App() {
           </button>
         </nav>
 
+<<<<<<< HEAD
 
+=======
+        {/* Bottom profile/stats info */}
+        {isSidebarOpen && (
+          <div className="p-4 border-t border-slate-800 bg-slate-950/40 text-[10px] font-mono text-slate-400 space-y-1">
+            <div>DASHBOARD</div>
+            <div>STAFF count: {stats.total} Roster</div>
+            <div>WDBOS work: {stats.active}</div>
+          </div>
+        )}
+>>>>>>> dd1fdeb9e7a80a95922018967ec719063483a626
       </aside>
 
       {/* --- CONTENT CONTAINER WRAPPER --- */}
@@ -706,6 +724,20 @@ export default function App() {
 
             {/* Quick Actions Global */}
             <div className="flex items-center gap-2">
+<<<<<<< HEAD
+=======
+              {/* Load & Sync 82 Roster Baru */}
+              <button
+                onClick={handleLoadAndSyncToSheets}
+                disabled={isSyncing}
+                className="inline-flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border border-transparent px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-all cursor-pointer disabled:opacity-50"
+                title="Masukkan data 82 staf baru & sinkronkan langsung ke Google Spreadsheet"
+              >
+                <Upload className={`w-3.5 h-3.5 ${isSyncing ? 'animate-bounce' : ''}`} />
+                <span>Simpan & Sync 82 Roster</span>
+              </button>
+
+>>>>>>> dd1fdeb9e7a80a95922018967ec719063483a626
               {/* Google Sheets Conn Button */}
               <button
                 onClick={() => setIsSheetsModalOpen(true)}
