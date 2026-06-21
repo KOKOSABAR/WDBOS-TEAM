@@ -1,0 +1,6 @@
+{
+  "name": "Dashboard Data Staff",
+  "description": "Sistem Dashboard Manajemen Data Staff lengkap dengan pencarian, filter, statistik, hitung umur otomatis, ulang tahun, dan pelacakan masa kerja.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
