@@ -529,7 +529,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased flex flex-col md:flex-row">
       
       {/* --- SIDEBAR PANEL --- */}
-      <aside className={`bg-slate-900 text-slate-300 w-full md:w-64 flex-shrink-0 flex flex-col transition-all border-r border-slate-800 ${isSidebarOpen ? 'block' : 'hidden md:flex md:w-20'}`}>
+      <aside className={`bg-slate-900 text-slate-300 w-full md:w-64 flex-shrink-0 flex flex-col transition-all border-r border-slate-800 ${isSidebarOpen ? 'block' : 'hidden'}`}>
         
         {/* Brand Header */}
         <div className="p-4 border-b border-slate-800 flex items-center justify-between">
@@ -547,7 +547,7 @@ export default function App() {
           
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
-            className="text-slate-400 hover:text-slate-100 md:block hidden cursor-pointer"
+            className="text-slate-400 hover:text-slate-100 cursor-pointer"
             title="Toggle Sidebar"
           >
             <Menu className="w-5 h-5" />
@@ -561,7 +561,7 @@ export default function App() {
             onClick={() => setActiveTab('staff_database')}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer ${activeTab === 'staff_database' ? 'bg-blue-600 text-white font-bold' : 'hover:bg-slate-800 hover:text-slate-100'}`}
           >
-            <Users className="w-4 h-4 flex-shrink-0" />
+            <Users className={`w-4 h-4 flex-shrink-0 ${activeTab === 'staff_database' ? 'text-white' : 'text-slate-400'}`} />
             {isSidebarOpen && <span>Data Staff</span>}
           </button>
 
@@ -570,7 +570,7 @@ export default function App() {
             onClick={() => setActiveTab('cuti_submission')}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer ${activeTab === 'cuti_submission' ? 'bg-blue-600 text-white font-bold' : 'hover:bg-slate-800 hover:text-slate-100'}`}
           >
-            <Calendar className="w-4 h-4 flex-shrink-0 text-amber-500" />
+            <Calendar className={`w-4 h-4 flex-shrink-0 ${activeTab === 'cuti_submission' ? 'text-white' : 'text-amber-500'}`} />
             {isSidebarOpen ? (
               <span className="text-left leading-normal">
                 Pengajuan Cuti WDBOS
@@ -583,7 +583,7 @@ export default function App() {
             onClick={() => setActiveTab('visa_expiry')}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer ${activeTab === 'visa_expiry' ? 'bg-blue-600 text-white font-bold' : 'hover:bg-slate-800 hover:text-slate-100'}`}
           >
-            <Plane className="w-4 h-4 flex-shrink-0 text-sky-400" />
+            <Plane className={`w-4 h-4 flex-shrink-0 ${activeTab === 'visa_expiry' ? 'text-white' : 'text-sky-400'}`} />
             {isSidebarOpen ? (
               <span className="text-left leading-normal hover:text-slate-100">
                 Masa Aktif Visa Staff
@@ -596,7 +596,7 @@ export default function App() {
             onClick={() => setActiveTab('staff_mistakes')}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer ${activeTab === 'staff_mistakes' ? 'bg-blue-600 text-white font-bold' : 'hover:bg-slate-800 hover:text-slate-100'}`}
           >
-            <AlertTriangle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+            <AlertTriangle className={`w-4 h-4 flex-shrink-0 ${activeTab === 'staff_mistakes' ? 'text-white' : 'text-rose-400'}`} />
             {isSidebarOpen ? (
               <span className="text-left leading-normal hover:text-slate-100">
                 Data Kesalahan
@@ -609,7 +609,7 @@ export default function App() {
             onClick={() => setActiveTab('staff_overtime')}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer ${activeTab === 'staff_overtime' ? 'bg-blue-600 text-white font-bold' : 'hover:bg-slate-800 hover:text-slate-100'}`}
           >
-            <Clock className="w-4 h-4 flex-shrink-0 text-indigo-400" />
+            <Clock className={`w-4 h-4 flex-shrink-0 ${activeTab === 'staff_overtime' ? 'text-white' : 'text-indigo-400'}`} />
             {isSidebarOpen ? (
               <span className="text-left leading-normal hover:text-slate-100">
                 Lemburan Staff
@@ -617,11 +617,12 @@ export default function App() {
             ) : null}
           </button>
 
+          {/* Link 6: KESALAHAN LC */}
           <button
             onClick={() => setActiveTab('staff_lc_mistakes')}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer ${activeTab === 'staff_lc_mistakes' ? 'bg-blue-600 text-white font-bold' : 'hover:bg-slate-800 hover:text-slate-100'}`}
           >
-            <Camera className="w-4 h-4 flex-shrink-0 text-pink-400" />
+            <Camera className={`w-4 h-4 flex-shrink-0 ${activeTab === 'staff_lc_mistakes' ? 'text-white' : 'text-pink-400'}`} />
             {isSidebarOpen ? (
               <span className="text-left leading-normal hover:text-slate-100">
                 Kesalahan LC
@@ -629,11 +630,12 @@ export default function App() {
             ) : null}
           </button>
 
+          {/* Link 7: TOTAL KESALAHAN CS */}
           <button
             onClick={() => setActiveTab('total_kesalahan_cs')}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 md:pl-8 rounded-lg text-[11px] font-semibold tracking-wider uppercase transition-all cursor-pointer ${activeTab === 'total_kesalahan_cs' ? 'bg-emerald-600 text-white font-bold' : 'hover:bg-slate-800 hover:text-slate-100 text-slate-400'}`}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer ${activeTab === 'total_kesalahan_cs' ? 'bg-blue-600 text-white font-bold' : 'hover:bg-slate-800 hover:text-slate-100'}`}
           >
-            <ShieldCheck className="w-4 h-4 flex-shrink-0 text-emerald-400" />
+            <ShieldCheck className={`w-4 h-4 flex-shrink-0 ${activeTab === 'total_kesalahan_cs' ? 'text-white' : 'text-emerald-400'}`} />
             {isSidebarOpen ? (
               <span className="text-left leading-normal">
                 Total Kesalahan CS
@@ -655,7 +657,8 @@ export default function App() {
             <div className="flex items-center gap-2">
               <button 
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
-                className="p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded md:hidden"
+                className={`p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded ${isSidebarOpen ? 'md:hidden' : 'block'}`}
+                title="Toggle Sidebar"
               >
                 <Menu className="w-5 h-5" />
               </button>
