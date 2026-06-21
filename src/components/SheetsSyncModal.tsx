@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Copy, Check, RefreshCw, UploadCloud, DownloadCloud, Database, ExternalLink } from 'lucide-react';
-import { Staff, LeaveSubmission, MistakeRecord, OvertimeRecord, calculateAge, getBirthdayInfo, calculateTenure } from '../types';
+import { Staff, LeaveSubmission, MistakeRecord, OvertimeRecord, KesalahanLcRecord, TotalKesalahanCsRecord, calculateAge, getBirthdayInfo, calculateTenure } from '../types';
 
 interface SheetsSyncModalProps {
   isOpen: boolean;
@@ -11,6 +11,10 @@ interface SheetsSyncModalProps {
   setOvertimeRecords: (records: OvertimeRecord[]) => void;
   mistakeRecords: MistakeRecord[];
   setMistakeRecords: (records: MistakeRecord[]) => void;
+  totalKesalahanCsRecords: TotalKesalahanCsRecord[];
+  setTotalKesalahanCsRecords: (records: TotalKesalahanCsRecord[]) => void;
+  kesalahanLcRecords: KesalahanLcRecord[];
+  setKesalahanLcRecords: (records: KesalahanLcRecord[]) => void;
   onRefreshCuti: () => void; // helper to tell CutiSubmissionView to reload from localStorage
 }
 
@@ -23,6 +27,10 @@ export default function SheetsSyncModal({
   setOvertimeRecords,
   mistakeRecords,
   setMistakeRecords,
+  totalKesalahanCsRecords,
+  setTotalKesalahanCsRecords,
+  kesalahanLcRecords,
+  setKesalahanLcRecords,
   onRefreshCuti
 }: SheetsSyncModalProps) {
   const [webAppUrl, setWebAppUrl] = useState<string>('');
@@ -128,6 +136,14 @@ function initializeSheets() {
   // 4. DATA_LEMBURAN_STAFF
   var headersOvertime = ["ID RECORD", "STAFF ID", "TANGGAL", "JUMLAH JAM LEMBUR", "KETERANGAN"];
   getOrCreateSheet("DATA_LEMBURAN_STAFF", headersOvertime);
+
+  // 5. KESALAHAN LC
+  var headersKesalahanLc = ["NAMA STAFF", "TANGGAL / SCREENSHOOT", "KETERANGAN"];
+  getOrCreateSheet("KESALAHAN LC", headersKesalahanLc);
+
+  // 6. TOTAL KESALAHAN CS
+  var headersTotalKesalahanCs = ["NAMA STAFF", "TOTAL KESALAHAN"];
+  getOrCreateSheet("TOTAL KESALAHAN CS", headersTotalKesalahanCs);
   
   // Hapus "Sheet1" bawaan kosong jika ada sheet lain
   var defSheet = ss.getSheetByName("Sheet1");
@@ -137,7 +153,7 @@ function initializeSheets() {
     } catch(e) {}
   }
   
-  SpreadsheetApp.getUi().alert("Sukses! Semua sheet (DATABASE_STAFF, DATA_CUTI_PENGAJUAN, DATA_KESALAHAN_STAFF, DATA_LEMBURAN_STAFF) dan header tabel database WDBOS telah dibuat secara otomatis dan diformat dengan rapi.");
+  SpreadsheetApp.getUi().alert("Sukses! Semua sheet (DATABASE_STAFF, DATA_CUTI_PENGAJUAN, DATA_KESALAHAN_STAFF, DATA_LEMBURAN_STAFF, KESALAHAN LC, TOTAL KESALAHAN CS) dan header tabel database WDBOS telah dibuat secara otomatis dan diformat dengan rapi.");
 }
 
 function handleResponse(data) {
@@ -266,7 +282,7 @@ function saveAllData(data) {
     sheet.getRange(1, 1, values.length, headers.length).setValues(values);
     formatHeaderRow(sheet, headers.length);
   }
-  
+
   // Format ulang lebar kolom agar rapi setelah diisi secara batch
   var ssSheets = ss.getSheets();
   ssSheets.forEach(function(sh) {
@@ -287,6 +303,8 @@ function fetchData() {
     staffList: [],
     leaveList: [],
     mistakeRecords: [],
+    totalKesalahanCsRecords: [],
+    kesalahanLcRecords: [],
     overtimeRecords: []
   };
 
@@ -380,6 +398,38 @@ function fetchData() {
         tanggal: formatDateString(row[2]),
         jumlahJam: Number(row[3] || 0),
         keterangan: String(row[4] || "")
+      });
+    }
+  }
+
+  // 5. Baca KESALAHAN LC
+  var sheetKesalahanLc = ss.getSheetByName("KESALAHAN LC");
+  if (sheetKesalahanLc) {
+    var rows = sheetKesalahanLc.getDataRange().getDisplayValues();
+    for (var r = 1; r < rows.length; r++) {
+      var row = rows[r];
+      if (!row[0] && !row[1] && !row[2]) continue;
+      data.kesalahanLcRecords.push({
+        id: "lc-sheet-" + r,
+        staffId: "",
+        namaStaff: String(row[0] || ""),
+        tanggalScreenshoot: String(row[1] || ""),
+        keterangan: String(row[2] || "")
+      });
+    }
+  }
+
+  // 6. Baca TOTAL KESALAHAN CS
+  var sheetTotalKesalahanCs = ss.getSheetByName("TOTAL KESALAHAN CS");
+  if (sheetTotalKesalahanCs) {
+    var rows = sheetTotalKesalahanCs.getDataRange().getDisplayValues();
+    for (var r = 1; r < rows.length; r++) {
+      var row = rows[r];
+      if (!row[0] && !row[1]) continue;
+      data.totalKesalahanCsRecords.push({
+        id: "total-cs-" + r,
+        namaStaff: String(row[0] || ""),
+        totalKesalahan: Number(row[1] || 0)
       });
     }
   }
@@ -504,6 +554,12 @@ function formatDateString(val) {
       if (resData.mistakeRecords) {
         setMistakeRecords(resData.mistakeRecords);
       }
+      if (resData.totalKesalahanCsRecords) {
+        setTotalKesalahanCsRecords(resData.totalKesalahanCsRecords);
+      }
+      if (resData.kesalahanLcRecords) {
+        setKesalahanLcRecords(resData.kesalahanLcRecords);
+      }
       if (resData.overtimeRecords) {
         setOvertimeRecords(resData.overtimeRecords);
       }
@@ -513,7 +569,7 @@ function formatDateString(val) {
       }
 
       setSyncStatus('success');
-      setLogMessage('Berhasil mengimpor data! Roster, Cuti, Kesalahan, dan Lemburan disinkronkan ke local storage.');
+      setLogMessage('Berhasil mengimpor data! Roster, Cuti, Kesalahan Staff, Total Kesalahan CS, Kesalahan LC, dan Lemburan disinkronkan ke local storage.');
     } catch (e: any) {
       console.error(e);
       setSyncStatus('error');
@@ -548,7 +604,7 @@ function formatDateString(val) {
               📌 Di Mana Database Disimpan Saat Ini?
             </h4>
             <p className="text-amber-800 leading-relaxed">
-              Saat ini, seluruh data staff, cuti, kesalahan, dan lemburan disimpan secara lokal di dalam browser Anda (<strong>Browser Local Storage</strong>). 
+              Saat ini, seluruh data staff, cuti, kesalahan, kesalahan LC, dan lemburan disimpan secara lokal di dalam browser Anda (<strong>Browser Local Storage</strong>). 
               Data ini aman dan tidak akan hilang saat halaman direfresh. Namun, apabila Anda membersihkan cache browser, atau membuka dari HP/komputer lain, data tidak akan saling terhubung.
             </p>
             <p className="text-amber-800 leading-relaxed font-semibold">

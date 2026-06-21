@@ -9,7 +9,6 @@ import {
   ArrowUpDown, 
   SlidersHorizontal,
   Clock,
-  ShieldCheck,
   User,
   Trash2,
   PlusCircle,
@@ -18,7 +17,8 @@ import {
   Layers,
   ChevronDown,
   Info,
-  ChevronRight
+  ChevronRight,
+  ExternalLink
 } from 'lucide-react';
 
 interface StaffMistakesViewProps {
@@ -36,6 +36,32 @@ export default function StaffMistakesView({
   onDeleteMistake,
   currentTime 
 }: StaffMistakesViewProps) {
+
+  // Helper to render text with clickable URLs
+  const renderTextWithLinks = (text: string) => {
+    if (!text) return '-';
+    
+    const urlRegex = /(https?:\/\/[^\s|]+)/g;
+    const parts = text.split(urlRegex);
+    
+    return parts.map((part, index) => {
+      if (urlRegex.test(part)) {
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 hover:underline break-all inline-flex items-center gap-0.5 font-semibold"
+          >
+            {part}
+            <ExternalLink className="w-2.5 h-2.5 inline shrink-0" />
+          </a>
+        );
+      }
+      return part;
+    });
+  };
   
   // Periode Filter States
   const currentDetails = useMemo(() => getPeriodeFromDate(currentTime.toISOString().split('T')[0]), [currentTime]);
@@ -659,8 +685,8 @@ export default function StaffMistakesView({
                           </span>
                         </td>
                         <td className="py-3 px-4 font-mono font-extrabold text-center text-slate-900">{rec.jumlah || 1}x</td>
-                        <td className="py-3 px-4 text-slate-650 max-w-sm truncate" title={rec.keterangan}>
-                          {rec.keterangan || '-'}
+                        <td className="py-3 px-4 text-slate-650 max-w-sm whitespace-pre-wrap break-words leading-relaxed" title={rec.keterangan}>
+                          {renderTextWithLinks(rec.keterangan)}
                         </td>
                         <td className="py-3 px-4 text-center">
                           <button

@@ -244,6 +244,12 @@ export interface MistakeRecord {
   keterangan: string;
 }
 
+export interface TotalKesalahanCsRecord {
+  id: string;
+  namaStaff: string;
+  totalKesalahan: number;
+}
+
 /**
  * Get period details from YYYY-MM-DD string.
  */

@@ -4,6 +4,8 @@ import {
   UserPlus, 
   X, 
   Calendar, 
+  Camera,
+  ShieldCheck,
   MapPin, 
   Mail, 
   BookOpen, 
@@ -14,7 +16,7 @@ import {
   Database
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Staff, calculateAge, getBirthdayInfo, calculateTenure, MistakeRecord, OvertimeRecord, LeaveSubmission, KesalahanLcRecord } from './types';
+import { Staff, calculateAge, getBirthdayInfo, calculateTenure, MistakeRecord, OvertimeRecord, LeaveSubmission, KesalahanLcRecord, TotalKesalahanCsRecord } from './types';
 import { SAMPLE_STAFF, SAMPLE_MISTAKES, SAMPLE_OVERTIMES } from './sampleData';
 
 // Modular Components
@@ -24,6 +26,7 @@ import VisaExpiryView from './components/VisaExpiryView';
 import StaffMistakesView from './components/StaffMistakesView';
 import StaffOvertimeView from './components/StaffOvertimeView';
 import KesalahanLcView from './components/KesalahanLcView';
+import TotalKesalahanCsView from './components/TotalKesalahanCsView';
 import SheetsSyncModal from './components/SheetsSyncModal';
 
 const getStatusFormBgClass = (status: string) => {
@@ -42,7 +45,7 @@ const getStatusFormBgClass = (status: string) => {
 
 export default function App() {
   // --- LAYOUT NAVIGATION ---
-  const [activeTab, setActiveTab] = useState<'staff_database' | 'cuti_submission' | 'visa_expiry' | 'staff_mistakes' | 'staff_overtime'>('staff_database');
+  const [activeTab, setActiveTab] = useState<'staff_database' | 'cuti_submission' | 'visa_expiry' | 'staff_mistakes' | 'staff_lc_mistakes' | 'total_kesalahan_cs' | 'staff_overtime'>('staff_database');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSheetsModalOpen, setIsSheetsModalOpen] = useState(false);
   const [sheetsSyncKey, setSheetsSyncKey] = useState(0);
@@ -147,6 +150,52 @@ export default function App() {
     setMistakeRecords(prev => prev.filter(m => m.id !== id));
   };
 
+  const [totalKesalahanCsRecords, setTotalKesalahanCsRecords] = useState<TotalKesalahanCsRecord[]>(() => {
+    const saved = localStorage.getItem('staff_db_total_kesalahan_cs');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Gagal memuat total kesalahan CS data:', e);
+      }
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('staff_db_total_kesalahan_cs', JSON.stringify(totalKesalahanCsRecords));
+  }, [totalKesalahanCsRecords]);
+
+  // Kesalahan LC List State
+  const [kesalahanLcRecords, setKesalahanLcRecords] = useState<KesalahanLcRecord[]>(() => {
+    const saved = localStorage.getItem('staff_db_kesalahan_lc');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Gagal memuat offline kesalahan LC data:', e);
+      }
+    }
+    return [];
+  });
+
+  // Persists kesalahan LC records to localStorage
+  useEffect(() => {
+    localStorage.setItem('staff_db_kesalahan_lc', JSON.stringify(kesalahanLcRecords));
+  }, [kesalahanLcRecords]);
+
+  const handleAddKesalahanLc = (newRecord: Omit<KesalahanLcRecord, 'id'>) => {
+    const record: KesalahanLcRecord = {
+      id: `lc-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      ...newRecord
+    };
+    setKesalahanLcRecords(prev => [record, ...prev]);
+  };
+
+  const handleDeleteKesalahanLc = (id: string) => {
+    setKesalahanLcRecords(prev => prev.filter(record => record.id !== id));
+  };
+
   // Overtime List State
   const [overtimeRecords, setOvertimeRecords] = useState<OvertimeRecord[]>(() => {
     const saved = localStorage.getItem('staff_db_overtimes');
@@ -247,6 +296,8 @@ export default function App() {
         // Sync data to state
         if (resData.staffList) setStaffList(resData.staffList);
         if (resData.mistakeRecords) setMistakeRecords(resData.mistakeRecords);
+        if (resData.totalKesalahanCsRecords) setTotalKesalahanCsRecords(resData.totalKesalahanCsRecords);
+        if (resData.kesalahanLcRecords) setKesalahanLcRecords(resData.kesalahanLcRecords);
         if (resData.overtimeRecords) setOvertimeRecords(resData.overtimeRecords);
         if (resData.leaveList) setLeaveList(resData.leaveList);
 
@@ -305,7 +356,7 @@ export default function App() {
     }, 1500);
 
     return () => clearTimeout(exportTimer);
-  }, [staffList, leaveList, mistakeRecords, overtimeRecords, isSyncing]);
+  }, [staffList, leaveList, mistakeRecords, kesalahanLcRecords, overtimeRecords, isSyncing]);
 
   // Form State
   const initialFormState: Omit<Staff, 'id'> = {
@@ -565,6 +616,30 @@ export default function App() {
               </span>
             ) : null}
           </button>
+
+          <button
+            onClick={() => setActiveTab('staff_lc_mistakes')}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer ${activeTab === 'staff_lc_mistakes' ? 'bg-blue-600 text-white font-bold' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+          >
+            <Camera className="w-4 h-4 flex-shrink-0 text-pink-400" />
+            {isSidebarOpen ? (
+              <span className="text-left leading-normal hover:text-slate-100">
+                Kesalahan LC
+              </span>
+            ) : null}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('total_kesalahan_cs')}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 md:pl-8 rounded-lg text-[11px] font-semibold tracking-wider uppercase transition-all cursor-pointer ${activeTab === 'total_kesalahan_cs' ? 'bg-emerald-600 text-white font-bold' : 'hover:bg-slate-800 hover:text-slate-100 text-slate-400'}`}
+          >
+            <ShieldCheck className="w-4 h-4 flex-shrink-0 text-emerald-400" />
+            {isSidebarOpen ? (
+              <span className="text-left leading-normal">
+                Total Kesalahan CS
+              </span>
+            ) : null}
+          </button>
         </nav>
 
 
@@ -594,7 +669,11 @@ export default function App() {
                         ? 'TRACKER MASA AKTIF VISA STAFF'
                         : activeTab === 'staff_mistakes'
                           ? 'SISTEM DATA KESALAHAN STAFF'
-                          : 'SISTEM DATA LEMBURAN STAFF'}
+                          : activeTab === 'staff_lc_mistakes'
+                            ? 'SISTEM DATA KESALAHAN LC'
+                            : activeTab === 'total_kesalahan_cs'
+                              ? 'SISTEM TOTAL KESALAHAN CS'
+                            : 'SISTEM DATA LEMBURAN STAFF'}
                 </h1>
                 <p className="text-[10px] text-slate-500 font-mono mt-0.5 leading-none">
                   {currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} • {currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
@@ -664,6 +743,15 @@ export default function App() {
               onAddMistake={handleAddMistake}
               onDeleteMistake={handleDeleteMistake}
               currentTime={currentTime}
+            />
+          ) : activeTab === 'staff_lc_mistakes' ? (
+            <KesalahanLcView
+              staffList={staffList.filter(s => s.jabatanPosisi?.trim().toUpperCase() !== 'LEADER')}
+              kesalahanLcRecords={kesalahanLcRecords}
+            />
+          ) : activeTab === 'total_kesalahan_cs' ? (
+            <TotalKesalahanCsView
+              totalKesalahanCsRecords={totalKesalahanCsRecords}
             />
           ) : (
             <StaffOvertimeView
@@ -1120,6 +1208,10 @@ export default function App() {
         setOvertimeRecords={setOvertimeRecords}
         mistakeRecords={mistakeRecords}
         setMistakeRecords={setMistakeRecords}
+        totalKesalahanCsRecords={totalKesalahanCsRecords}
+        setTotalKesalahanCsRecords={setTotalKesalahanCsRecords}
+        kesalahanLcRecords={kesalahanLcRecords}
+        setKesalahanLcRecords={setKesalahanLcRecords}
         onRefreshCuti={() => setSheetsSyncKey(prev => prev + 1)}
       />
 
